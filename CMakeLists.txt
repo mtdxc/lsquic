@@ -2,13 +2,19 @@
 cmake_minimum_required(VERSION 3.0...3.23)
 
 
-PROJECT(lsquic C)
+PROJECT(lsquic C CXX)
 
 OPTION(LSQUIC_FIU "Use Fault Injection in Userspace (FIU)" OFF)
 OPTION(LSQUIC_BIN "Compile example binaries that use the library" ON)
 OPTION(LSQUIC_TESTS "Compile library unit tests" ON)
-OPTION(LSQUIC_SHARED_LIB "Compile as shared librarry" OFF)
+OPTION(LSQUIC_SHARED_LIB "Compile as shared librarry" ON)
 OPTION(LSQUIC_DEVEL "Compile in development mode" OFF)
+SET(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(LIBDIR lib)
+set(BINDIR bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LIBDIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LIBDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BINDIR})
 
 INCLUDE(GNUInstallDirs)
 
@@ -112,7 +118,7 @@ SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} /wd4459")	# hide global declaration
 SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} /wd4706")	# assignment within conditional expression
 SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} /wd4090")	# different 'const' qualifier (TODO: debug ls-sfparser.c)
 SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} /wd4305")	# truncation from double to float
-SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} -W4 -WX -Zi -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS -I${CMAKE_CURRENT_SOURCE_DIR}/wincompat")
+SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} -Zi -DWIN32_LEAN_AND_MEAN -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS -I${CMAKE_CURRENT_SOURCE_DIR}/wincompat")
 IF(LSQUIC_SHARED_LIB)
     SET(MY_CMAKE_FLAGS "${MY_CMAKE_FLAGS} -DLSQUIC_SHARED_LIB")
 ENDIF()
@@ -172,7 +178,7 @@ IF (NOT DEFINED BORINGSSL_LIB AND DEFINED BORINGSSL_DIR)
         IF (CMAKE_SYSTEM_NAME STREQUAL Windows)
             FIND_LIBRARY(BORINGSSL_LIB_${LIB_NAME}
                 NAMES ${LIB_NAME}
-                PATHS ${BORINGSSL_DIR}/${LIB_NAME}
+                PATHS ${BORINGSSL_DIR}/build/${LIB_NAME}
 		PATH_SUFFIXES Debug Release MinSizeRel RelWithDebInfo
                 NO_DEFAULT_PATH)
         ELSE()
@@ -343,3 +349,4 @@ if(WIN32)
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lsquic
     )
 endif()
+add_subdirectory(cpp_demo)
